@@ -1,0 +1,126 @@
+---
+title: "SPA-Thorax"
+thanks: "Dr Pertuiset - Rhumatologie"
+subtitle: "Plan d'analyse statistique"
+author: "Philippe MICHEL"
+date: "`r format(Sys.Date(),'%d %B %Y')`"
+html:
+  toc: true
+  html-math-method: katex
+format: pdf
+pdf-engine: lualatex
+keep-tex: true
+number-sections: true
+toc: false
+lof: false
+lot: false
+mainfont: Minion Pro
+mainfontoptions:
+  - Numbers=OldStyle
+  - Ligatures=TeX
+  - Ligatures= Rare
+  - Ligatures= Historic
+  - Style=Alternate
+  - Contextuals = Swash
+sansfont: Myriad Pro
+sansfontoptions:
+  - Ligatures=TeX
+mathfontoptions: 
+  - Numbers=Proportional
+fig-cap-location: bottom
+tbl-cap-location: top
+class: scrartcl
+classoption: [french]
+lang: fr-FR
+papersize: a4paper
+editor: source
+cite-method: biblatex
+bibliography: stat.bib
+license: "CC BY-SA"
+---
+
+```{r setup, include= FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE, cache = FALSE,
+ fig.width = 7,
+ fig.asp = 0.8,
+ out.width = "100%"
+)
+```
+
+```{r info}
+rm(list=ls())
+library("baseph")
+library("tidyverse")
+library("kableExtra")
+# sessionInfo()
+```
+
+```{r}
+nom <- tibble(names(tt),nn)
+names(nom) <- c("variable", "variable_label")
+nnx <- deframe(nom)
+tt <- patients |> 
+  set_variable_labels(!!!nnx)
+```
+
+
+Le risque $\alpha$ retenu sera de 0,05 & la puissance de 0,8.
+
+Sauf indication contraires pour les tests simples les variables numériques seront comparées par un test de Student sauf si les effectifs se révèlent trop faibles ou les distribution non normales auquel cas un test non paramétrique de Wilcoxon sera utilisé. Un test du $\chi^2$ sera utilisé pour les variables discrètes sous réserve d'un effectif suffisant. 
+
+## Description de la population
+
+La population étudiée se répartit sur trois groupes :
+
+- Groupe témoin `témoin`
+- Groupe AxSpA radiographique `AxSpA_R`
+- Groupe AxSpA non radiographique `AxSpA_NR`
+
+## Taille de l'échantillon
+
+En visant une spécificité à 80 % dans la population totale (`AxSpA` + `témoins`) & une précision souhaitée de 5 %, un échantillon total de 380 patients est nécessaire pour des groupes égaux.
+
+### Analyse simple
+
+Un tableau présentera les valeurs démographiques & clinique pour l'ensemble de la population puis pour chaque groupe. Les valeurs numériques seront présentées en moyenne ± écart-type, les valeurs discrètes en % avec son intervalle de confiance à 95 %. Une différence entre les groupes sera recherchée, item par item afin de valider au mieux l'équivalence entre les groupes.
+
+Des graphiques de distribution pourront être réalisés pour les items les plus importants.
+
+Il faut noter que les sujets `témoins` seront sélectionnés par tirage au sort dans un échantillon important en stratifiant sur l'âge & le sexe afin de rester proche du groupe `AxSpA`
+
+Une recherche de corrélation entre les variables radiologiques sera réalisée, celles-ci devant être prises en compte pour les analyses. Si certaines variables se montreront trop corrélées certaines devront être exclues de l'étude après accord du promoteur.  
+
+
+## Objectif principal
+
+*Définir l’atteinte structurale de l’articulation manubriosternale dans la spondyloarthrite axiale en comparant ses aspects au scanner (tomodensitométrie) entre une population de patients atteints de spondyloarthrite axiale non radiographique et une population témoin indemne de rhumatisme inflammatoire chronique.*
+
+Deux tableaux présenteront, item par item la fréquence groupe par groupe avec les comparaisons  `témoin/AxSpA_R` & `témoin/AxSpA_NR`.
+
+Afin d'établir un critère diagnostique d'atteinte de l'articulation MST un modèle de régression logistique sera employée basée sur la comparaison témoin/AxSpA_R.  Cs modèle
+de régression permettra d’explorer les facteurs associés à la réponse, après un
+balayage bivarié retenant comme candidats les facteurs ayant une association avec la réponse
+significative à p=0,2. Une recherche du meilleur modèle sera réalisée par un step-by-step descendant évaluée par le critère d’information d’Akaike. Cette étape sera réalisée après imputation des données manquantes mais le résultat final sera calculé sur les données vraies. 
+
+
+## Objectifs secondaires
+
+### Prévalence
+
+En se basant sur le critère diagnostic estimée à l’étape précédente la prévalence de l'atteinte de l'articulation MST sera calculé dans les trois population & des comparaisons seront réalisées entre les trois groupes. Si il existe, malgré la stratification, une différence sur l'âge entre les groupes, les tests seront réalisés après standardisation.
+
+
+### Assocation avec des phénotypes
+
+Une assocation entre le diagnostic d'atteinte de l'articulation MST & des variables cliniques ou biologique sera recherchée par tests simples puis par régression logistique. Tous les items ayant une différence mise en évidence par une p-value < 20 % seront pris compte en première intention. Une recherche du meilleur modèle sera alors réalisée par un step-by-step descendant évaluée par le critère d’information d’Akaike. Cette étape sera réalisée après imputation des données manquantes mais le résultat final sera calculé sur les données vraies. 
+
+
+## Technique {.appendix}
+
+L’analyse statistique sera réalisée avec le logiciel R (R Core Team 2022) & divers packages en
+particulier tidyverse (Wickham et al. 2019), FactoMineR (Lê, Josse, and Husson 2008),
+epiDisplay (Chongsuvivatwong 2022) & baseph (Michel 2022).
+
+Un dépôt GitHub© sera utilisé qui ne contiendra que le code & non les données ou résultats
+https://github.com/philippemichel/SPA_Thorax.
+
