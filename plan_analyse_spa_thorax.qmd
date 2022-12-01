@@ -88,7 +88,7 @@ Des graphiques de distribution pourront être réalisés pour les items les plus
 
 Il faut noter que les sujets `témoins` seront sélectionnés par tirage au sort dans un échantillon important en stratifiant sur l'âge & le sexe afin de rester proche du groupe `AxSpA`
 
-Une recherche de corrélation entre les variables radiologiques sera réalisée, celles-ci devant être prises en compte pour les analyses. Si certaines variables se montreront trop corrélées certaines devront être exclues de l'étude après accord du promoteur.  
+Une recherche de corrélation entre les variables radiologiques sera réalisée, celles-ci devant être prises en compte pour les analyses. Si certaines variables se montreront trop corrélées certaines devront être exclues de l'étude après accord du promoteur.
 
 
 ## Objectif principal
