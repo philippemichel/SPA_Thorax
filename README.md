@@ -10,7 +10,7 @@ Ce dépot ne contient que le code **R** & $\LaTeX$ utilisé, pas les données ou
 
 ## Planning
 
-01/12/22 : Plan d'analyse statistique.
+16/02/2023 : Plan d'analyse statistique.
 
 
 

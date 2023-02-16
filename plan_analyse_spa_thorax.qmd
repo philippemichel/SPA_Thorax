@@ -1,41 +1,44 @@
 ---
 title: "SPA-Thorax"
-thanks: "Dr Pertuiset - Rhumatologie"
 subtitle: "Plan d'analyse statistique"
 author: "Philippe MICHEL"
-date: "`r format(Sys.Date(),'%d %B %Y')`"
-html:
-  toc: true
-  html-math-method: katex
-format: pdf
+lang: fr-FR
+date: todayw
+date-format: "DD/MM/YYYY"
+format: 
+  titlepage-pdf:
+    titlepage: vline
+    titlepage-footer: "Dr Pertuiset -- Rhumatologie"
+    titlepage-logo: "novo_usrc.png"
+    documentclass: scrartcl
+    classoption: ["oneside", "open=any"]
+    number-sections: true
+titlepage-theme:
+    title-fontstyle: ["huge", "bfseries"]
+    subtitle-fontstyle: ["Large"]
+    logo-size: "0.2\\textheight"
+jss-pdf:
+    keep-tex: true   
 pdf-engine: lualatex
 keep-tex: true
 number-sections: true
 toc: false
 lof: false
 lot: false
-mainfont: Minion Pro
+mainfont: Faune
 mainfontoptions:
   - Numbers=OldStyle
   - Ligatures=TeX
-  - Ligatures= Rare
-  - Ligatures= Historic
-  - Style=Alternate
-  - Contextuals = Swash
 sansfont: Myriad Pro
 sansfontoptions:
   - Ligatures=TeX
-mathfontoptions: 
-  - Numbers=Proportional
 fig-cap-location: bottom
 tbl-cap-location: top
-class: scrartcl
 classoption: [french]
-lang: fr-FR
 papersize: a4paper
 editor: source
-cite-method: biblatex
 bibliography: stat.bib
+cite-method: biblatex
 license: "CC BY-SA"
 ---
 
@@ -54,19 +57,15 @@ library("tidyverse")
 library("kableExtra")
 # sessionInfo()
 ```
-
-```{r}
-nom <- tibble(names(tt),nn)
-names(nom) <- c("variable", "variable_label")
-nnx <- deframe(nom)
-tt <- patients |> 
-  set_variable_labels(!!!nnx)
-```
-
+## Généralités
 
 Le risque $\alpha$ retenu sera de 0,05 & la puissance de 0,8.
 
-Sauf indication contraires pour les tests simples les variables numériques seront comparées par un test de Student sauf si les effectifs se révèlent trop faibles ou les distribution non normales auquel cas un test non paramétrique de Wilcoxon sera utilisé. Un test du $\chi^2$ sera utilisé pour les variables discrètes sous réserve d'un effectif suffisant. 
+Sauf indication contraires pour les tests simples les variables numériques seront comparées par un test de Student si possible ( effectifs suffisants, distribution normales (Test de Shapiro-Wilk), égalité des variances) auquel cas un test non paramétrique de Wilcoxon sera utilisé. Un test du $\chi^2$ sera utilisé pour les variables discrètes sous réserve d'un effectif suffisant. À défaut un test de Fischer sera utilisé. Des graphiques seront réalisés pour les résultats importants (package `ggplot2` [@ggplot]).
+
+## Taille de l'échantillon
+
+En visant une spécificité à 80 % dans la population totale (`AxSpA` + `témoins`) & une précision souhaitée de 5 %, un échantillon total de 380 patients est nécessaire pour des groupes égaux.
 
 ## Description de la population
 
@@ -76,11 +75,13 @@ La population étudiée se répartit sur trois groupes :
 - Groupe AxSpA radiographique `AxSpA_R`
 - Groupe AxSpA non radiographique `AxSpA_NR`
 
-## Taille de l'échantillon
+## Données manquantes
 
-En visant une spécificité à 80 % dans la population totale (`AxSpA` + `témoins`) & une précision souhaitée de 5 %, un échantillon total de 380 patients est nécessaire pour des groupes égaux.
+Le décompte des données manquantes sera réalisé & présenté par un tableau ou un graphique. Les dossiers où aucun critère radiologique sera noté seront exclus de l'étude. De même les variables comportant trop de données manquantes ou non utilisables ne seront pas prises en compte après validation par le promoteur.
 
-### Analyse simple
+Après ce premier tri une imputation des données manquantes (package `missMDA` [@miss]) sera réalisée uniquement pour l'analyse factorielle & pour la recherche du meilleur modèle par step-by-tep descendant pour les analyses par régression (logistique ou linéaire). Néanmoins pour cette analyse, après choix du modèle, le calcul final sera fait avec les données réelles. 
+
+## Description de l'échantillon
 
 Un tableau présentera les valeurs démographiques & clinique pour l'ensemble de la population puis pour chaque groupe. Les valeurs numériques seront présentées en moyenne ± écart-type, les valeurs discrètes en % avec son intervalle de confiance à 95 %. Une différence entre les groupes sera recherchée, item par item afin de valider au mieux l'équivalence entre les groupes.
 
@@ -90,6 +91,9 @@ Il faut noter que les sujets `témoins` seront sélectionnés par tirage au sort
 
 Une recherche de corrélation entre les variables radiologiques sera réalisée, celles-ci devant être prises en compte pour les analyses. Si certaines variables se montreront trop corrélées certaines devront être exclues de l'étude après accord du promoteur.
 
+### Analyse factorielle
+
+Afin de rechercher des regroupements de signes radiologiques ou si certains signes semblent plus discriminants une analyse factorielle par MCA (Analyse en composantes multiples (package `FactoMineR` [@facto]) sera réalisée après imputation des données manquantes. Cette étude portera sur l'ensemble des trois groupes.
 
 ## Objectif principal
 
@@ -97,30 +101,38 @@ Une recherche de corrélation entre les variables radiologiques sera réalisée,
 
 Deux tableaux présenteront, item par item la fréquence groupe par groupe avec les comparaisons  `témoin/AxSpA_R` & `témoin/AxSpA_NR`.
 
-Afin d'établir un critère diagnostique d'atteinte de l'articulation MST un modèle de régression logistique sera employée basée sur la comparaison témoin/AxSpA_R.  Cs modèle
-de régression permettra d’explorer les facteurs associés à la réponse, après un
-balayage bivarié retenant comme candidats les facteurs ayant une association avec la réponse
-significative à p=0,2. Une recherche du meilleur modèle sera réalisée par un step-by-step descendant évaluée par le critère d’information d’Akaike. Cette étape sera réalisée après imputation des données manquantes mais le résultat final sera calculé sur les données vraies. 
+Afin d'établir un critère diagnostique d'atteinte de l'articulation MST un modèle de régression logistique sera employée basée sur la comparaison témoin/AxSpA_R. Un modèle binomial sear utilisé si possible (après vérification des hypothèses de normalité et d’homoscédasticité des résidus). Ce modèle de régression permettra d’explorer les facteurs associés à la réponse, après un balayage bivarié retenant comme candidats les facteurs ayant une association avec la réponse significative à p=0,2. Une recherche du meilleur modèle sera réalisée par un step-by-step descendant évaluée par le critère d’information d’Akaike. Cette étape sera réalisée après imputation des données manquantes mais le résultat final sera calculé sur les données vraies. 
 
+### Choix d'un groupe de critères significatifs
+
+En se basant sur l'analyse par régression un premier choix des critères significatifs sera réalisé. Ce score sera précisé en testant différentes combinaisons & en calculant la spécificité & la sensibilité pour chacune puis en les comparant. Un score sera aussi testé en comptant un point par item afin d'avoir un résultat numérique & de pouvoir établir les courbes ROC & les comparer par analyse de la surface sous la courbe (AUC). 
+
+Il ne s'agit là que d'une première approche d'un score diagnostic, absolument pas d'une validation de ce score ce qui nécessiterai au minimum une nouvelle étude sur un échantillon différent.
 
 ## Objectifs secondaires
 
 ### Prévalence
 
-En se basant sur le critère diagnostic estimée à l’étape précédente la prévalence de l'atteinte de l'articulation MST sera calculé dans les trois population & des comparaisons seront réalisées entre les trois groupes. Si il existe, malgré la stratification, une différence sur l'âge entre les groupes, les tests seront réalisés après standardisation.
+En se basant sur le critère diagnostic estimée à l’étape précédente la prévalence de l'atteinte de l'articulation MST sera calculé dans les trois populations & des comparaisons seront réalisées entre les trois groupes. S'il existe, malgré la stratification, une différence sur l'âge entre les groupes les tests seront réalisés après standardisation.
 
 
 ### Assocation avec des phénotypes
 
-Une assocation entre le diagnostic d'atteinte de l'articulation MST & des variables cliniques ou biologique sera recherchée par tests simples puis par régression logistique. Tous les items ayant une différence mise en évidence par une p-value < 20 % seront pris compte en première intention. Une recherche du meilleur modèle sera alors réalisée par un step-by-step descendant évaluée par le critère d’information d’Akaike. Cette étape sera réalisée après imputation des données manquantes mais le résultat final sera calculé sur les données vraies. 
+Une association entre le diagnostic d'atteinte de l'articulation MST & des variables cliniques ou biologiques sera recherchée par tests simples puis par régression logistique.  Pour cette dernière tous les items ayant une différence mise en évidence par une p-value < 0,02 seront pris compte en première intention. Une recherche du meilleur modèle sera alors réalisée par un step-by-step descendant évaluée par le critère d’information d’Akaike. Cette étape sera réalisée après imputation des données manquantes mais le résultat final sera calculé sur les données vraies. 
+
+## Étude ancillaire
+
+Une lecture identique portant sur les articulations sterno-claviculaires sera réalisée par les radiologues de l’équipe du Pr Bousson (AP-HP). La même approche sera utilisée (analyse en bivariée entre les trois groupes puis création d'un modèle en régression logistique en comparant `témoin/AxSpA_R`).
 
 
-## Technique {.appendix}
+{.appendix}
 
-L’analyse statistique sera réalisée avec le logiciel R (R Core Team 2022) & divers packages en
-particulier tidyverse (Wickham et al. 2019), FactoMineR (Lê, Josse, and Husson 2008),
-epiDisplay (Chongsuvivatwong 2022) & baseph (Michel 2022).
+## Technique 
+
+L'analyse statistique sera réalisée avec le logiciel **R** [@rstat] & divers packages . outre cuex déjà cités dans le texte on utilisera en particulier `tidyverse` [@tidy],  [@facto] & `baseph` [@baseph]. 
 
 Un dépôt GitHub© sera utilisé qui ne contiendra que le code & non les données ou résultats
-https://github.com/philippemichel/SPA_Thorax.
+<https://github.com/philippemichel/SPA_Thorax>.
+
+## Bibliographie
 
